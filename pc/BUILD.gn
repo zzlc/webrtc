@@ -7,6 +7,10 @@
 # be found in the AUTHORS file in the root of the source tree.
 
 import("../webrtc.gni")
+import("//build/buildflag_header.gni")
+import("//build/config/allocator.gni")
+import("//build/config/compiler/compiler.gni")
+
 if (is_android) {
   import("//build/config/android/config.gni")
   import("//build/config/android/rules.gni")
@@ -88,8 +92,6 @@ rtc_static_library("rtc_pc_base") {
   if (rtc_build_libsrtp) {
     deps += [ "//third_party/libsrtp" ]
   }
-
-  public_configs = [ ":rtc_pc_config" ]
 
   if (!build_with_chromium && is_clang) {
     # Suppress warnings from the Chromium Clang plugin (bugs.webrtc.org/163).
@@ -178,7 +180,7 @@ rtc_static_library("peerconnection") {
   ]
 
   configs += [ ":libjingle_peerconnection_warnings_config" ]
-
+  
   if (!build_with_chromium && is_clang) {
     # Suppress warnings from the Chromium Clang plugin (bugs.webrtc.org/163).
     suppressed_configs += [ "//build/config/clang:find_bad_constructs" ]
@@ -212,6 +214,8 @@ rtc_static_library("peerconnection") {
     "../system_wrappers",
     "../system_wrappers:field_trial_api",
   ]
+  cflags = [ "-fvisibility=default" ]
+  cflags_cc = [ "-fvisibility=default" ]
 }
 
 # This target implements CreatePeerConnectionFactory methods that will create a
