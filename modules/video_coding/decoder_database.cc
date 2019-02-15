@@ -24,21 +24,24 @@ namespace webrtc {
 // Create an internal Decoder given a codec type
 static std::unique_ptr<VCMGenericDecoder> CreateDecoder(VideoCodecType type) {
   switch (type) {
-    case kVideoCodecVP8:
-      return std::unique_ptr<VCMGenericDecoder>(
-          new VCMGenericDecoder(VP8Decoder::Create()));
-    case kVideoCodecVP9:
-      return std::unique_ptr<VCMGenericDecoder>(
-          new VCMGenericDecoder(VP9Decoder::Create()));
-    case kVideoCodecI420:
-      return std::unique_ptr<VCMGenericDecoder>(
-          new VCMGenericDecoder(new I420Decoder()));
+    // add by cgb
+#ifndef WEBRTC_LINUX
+    // case kVideoCodecVP8:
+    //   return std::unique_ptr<VCMGenericDecoder>(
+    //       new VCMGenericDecoder(VP8Decoder::Create()));
+    // case kVideoCodecVP9:
+    //   return std::unique_ptr<VCMGenericDecoder>(
+    //       new VCMGenericDecoder(VP9Decoder::Create()));
+    // case kVideoCodecI420:
+    //   return std::unique_ptr<VCMGenericDecoder>(
+    //       new VCMGenericDecoder(new I420Decoder()));
     case kVideoCodecH264:
       if (H264Decoder::IsSupported()) {
         return std::unique_ptr<VCMGenericDecoder>(
             new VCMGenericDecoder(H264Decoder::Create()));
       }
       break;
+#endif // WEBRTC_LINUX
     default:
       break;
   }

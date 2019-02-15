@@ -58,11 +58,14 @@ class BuiltinVideoEncoderFactory : public VideoEncoderFactory {
     std::unique_ptr<VideoEncoder> internal_encoder;
     if (IsFormatSupported(internal_encoder_factory_->GetSupportedFormats(),
                           format)) {
-      internal_encoder =
-          cricket::CodecNamesEq(format.name.c_str(), cricket::kVp8CodecName)
-              ? rtc::MakeUnique<VP8EncoderSimulcastProxy>(
-                    internal_encoder_factory_.get())
-              : internal_encoder_factory_->CreateVideoEncoder(format);
+      // internal_encoder =
+      //     cricket::CodecNamesEq(format.name.c_str(), cricket::kVp8CodecName)
+      //         ? rtc::MakeUnique<VP8EncoderSimulcastProxy>(
+      //               internal_encoder_factory_.get())
+      //         : internal_encoder_factory_->CreateVideoEncoder(format);
+      
+      // add by cgb
+      internal_encoder = internal_encoder_factory_->CreateVideoEncoder(format);
     }
 
     return internal_encoder;

@@ -24,15 +24,19 @@ std::vector<SdpVideoFormat> InternalDecoderFactory::GetSupportedFormats()
     const {
   std::vector<SdpVideoFormat> formats;
   formats.push_back(SdpVideoFormat(cricket::kVp8CodecName));
+#ifndef WEBRTC_LINUX
   if (VP9Decoder::IsSupported())
     formats.push_back(SdpVideoFormat(cricket::kVp9CodecName));
   for (const SdpVideoFormat& h264_format : SupportedH264Codecs())
     formats.push_back(h264_format);
+#endif // WEBRTC_LINUX
   return formats;
 }
 
 std::unique_ptr<VideoDecoder> InternalDecoderFactory::CreateVideoDecoder(
     const SdpVideoFormat& format) {
+      
+#ifndef WEBRTC_LINUX
   if (cricket::CodecNamesEq(format.name, cricket::kVp8CodecName))
     return VP8Decoder::Create();
 
@@ -43,6 +47,7 @@ std::unique_ptr<VideoDecoder> InternalDecoderFactory::CreateVideoDecoder(
 
   if (cricket::CodecNamesEq(format.name, cricket::kH264CodecName))
     return H264Decoder::Create();
+#endif // WEBRTC_LINUX
 
   RTC_LOG(LS_ERROR) << "Trying to create decoder for unsupported format";
   return nullptr;

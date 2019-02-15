@@ -2116,7 +2116,7 @@ bool AudioDeviceLinuxPulse::PlayThreadProcess() {
       // AudioDeviceBuffer ensure that this callback is executed
       // without taking the audio-thread lock.
       UnLock();
-      RTC_LOG(LS_VERBOSE) << "requesting data";
+      // RTC_LOG(LS_VERBOSE) << "requesting data";
       uint32_t nSamples = _ptrAudioBuffer->RequestPlayoutData(numPlaySamples);
       Lock();
 
@@ -2136,7 +2136,7 @@ bool AudioDeviceLinuxPulse::PlayThreadProcess() {
         write = _tempBufferSpace;
       }
 
-      RTC_LOG(LS_VERBOSE) << "will write";
+      // RTC_LOG(LS_VERBOSE) << "will write";
       PaLock();
       if (LATE(pa_stream_write)(_playStream, (void*)&_playBuffer[0], write,
                                 NULL, (int64_t)0, PA_SEEK_RELATIVE) != PA_OK) {

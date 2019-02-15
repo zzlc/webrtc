@@ -122,8 +122,18 @@ rtc_static_library("video_coding") {
   if (rtc_use_builtin_sw_codecs) {
     deps += [
       ":webrtc_i420",
-      ":webrtc_vp8",
-      ":webrtc_vp9",
+      # ":webrtc_vp8",
+      # ":webrtc_vp9",
+    ]
+  }
+
+  if (is_linux) {
+    print("Linux OS will disable webrtc_h264 module!")
+    # ":webrtc_h264",
+  } else {
+    print("Not Linux OS will enable webrtc_h264 module!")
+    deps += [
+      ":webrtc_h264",
     ]
   }
 
@@ -132,9 +142,9 @@ rtc_static_library("video_coding") {
     ":encoded_frame",
     ":video_codec_interface",
     ":video_coding_utility",
-    ":webrtc_h264",
-    ":webrtc_vp8_helpers",
-    ":webrtc_vp9_helpers",
+    # ":webrtc_h264",
+    # ":webrtc_vp8_helpers",
+    # ":webrtc_vp9_helpers",
     "..:module_api",
     "..:module_api_public",
     "../..:webrtc_common",

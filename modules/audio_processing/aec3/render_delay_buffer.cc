@@ -417,7 +417,7 @@ int RenderDelayBufferImpl::MapInternalDelayToExternalDelay() const {
 
 // Set the read indices according to the delay.
 void RenderDelayBufferImpl::ApplyDelay(int delay) {
-  RTC_LOG(LS_WARNING) << "Applying internal delay of " << delay << " blocks.";
+  //RTC_LOG(LS_WARNING) << "Applying internal delay of " << delay << " blocks.";
   blocks_.read = blocks_.OffsetIndex(blocks_.write, -delay);
   spectra_.read = spectra_.OffsetIndex(spectra_.write, delay);
   ffts_.read = ffts_.OffsetIndex(ffts_.write, delay);

@@ -20,7 +20,8 @@
 #if WEBRTC_USE_BUILTIN_ILBC
 #include "api/audio_codecs/ilbc/audio_encoder_ilbc.h"  // nogncheck
 #endif
-#include "api/audio_codecs/isac/audio_encoder_isac.h"
+//add by cgb
+// #include "api/audio_codecs/isac/audio_encoder_isac.h"
 #if WEBRTC_USE_BUILTIN_OPUS
 #include "api/audio_codecs/opus/audio_encoder_opus.h"  // nogncheck
 #endif
@@ -53,19 +54,22 @@ struct NotAdvertised {
 }  // namespace
 
 rtc::scoped_refptr<AudioEncoderFactory> CreateBuiltinAudioEncoderFactory() {
-  return CreateAudioEncoderFactory<
+//   return CreateAudioEncoderFactory<
 
-#if WEBRTC_USE_BUILTIN_OPUS
-      AudioEncoderOpus,
-#endif
+// #if WEBRTC_USE_BUILTIN_OPUS
+//       AudioEncoderOpus,
+// #endif
 
-      AudioEncoderIsac, AudioEncoderG722,
+//       AudioEncoderIsac, AudioEncoderG722,
 
-#if WEBRTC_USE_BUILTIN_ILBC
-      AudioEncoderIlbc,
-#endif
+// #if WEBRTC_USE_BUILTIN_ILBC
+//       AudioEncoderIlbc,
+// #endif
 
-      AudioEncoderG711, NotAdvertised<AudioEncoderL16>>();
+//       AudioEncoderG711, NotAdvertised<AudioEncoderL16>>();
+
+  // only support opus, add by cgb
+  return CreateAudioEncoderFactory<AudioEncoderOpus>();
 }
 
 }  // namespace webrtc
