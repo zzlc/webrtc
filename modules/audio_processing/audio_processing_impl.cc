@@ -1218,14 +1218,14 @@ int AudioProcessingImpl::ProcessCaptureStreamLocked() {
   AudioBuffer* capture_buffer = capture_.capture_audio.get();  // For brevity.
 
   if (private_submodules_->pre_amplifier) {
-    private_submodules_->pre_amplifier->ApplyGain(AudioFrameView<float>(
-        capture_buffer->channels_f(), capture_buffer->num_channels(),
-        capture_buffer->num_frames()));
+    //private_submodules_->pre_amplifier->ApplyGain(AudioFrameView<float>(
+    //    capture_buffer->channels_f(), capture_buffer->num_channels(),
+    //    capture_buffer->num_frames()));
   }
 
   capture_input_rms_.Analyze(rtc::ArrayView<const int16_t>(
-      capture_buffer->channels_const()[0],
-      capture_nonlocked_.capture_processing_format.num_frames()));
+     capture_buffer->channels_const()[0],
+     capture_nonlocked_.capture_processing_format.num_frames()));
   const bool log_rms = ++capture_rms_interval_counter_ >= 1000;
   if (log_rms) {
     capture_rms_interval_counter_ = 0;
@@ -1245,9 +1245,9 @@ int AudioProcessingImpl::ProcessCaptureStreamLocked() {
 
   if (constants_.use_experimental_agc &&
       public_submodules_->gain_control->is_enabled()) {
-    private_submodules_->agc_manager->AnalyzePreProcess(
-        capture_buffer->channels()[0], capture_buffer->num_channels(),
-        capture_nonlocked_.capture_processing_format.num_frames());
+    //private_submodules_->agc_manager->AnalyzePreProcess(
+    //    capture_buffer->channels()[0], capture_buffer->num_channels(),
+    //    capture_nonlocked_.capture_processing_format.num_frames());
   }
 
   if (submodule_states_.CaptureMultiBandSubModulesActive() &&
@@ -1265,8 +1265,8 @@ int AudioProcessingImpl::ProcessCaptureStreamLocked() {
   }
 
   if (capture_nonlocked_.beamformer_enabled) {
-    private_submodules_->beamformer->AnalyzeChunk(
-        *capture_buffer->split_data_f());
+  //  private_submodules_->beamformer->AnalyzeChunk(
+  //      *capture_buffer->split_data_f());
     // Discards all channels by the leftmost one.
     capture_buffer->set_num_channels(1);
   }
@@ -1274,17 +1274,17 @@ int AudioProcessingImpl::ProcessCaptureStreamLocked() {
   // TODO(peah): Move the AEC3 low-cut filter to this place.
   if (private_submodules_->low_cut_filter &&
       !private_submodules_->echo_controller) {
-    private_submodules_->low_cut_filter->Process(capture_buffer);
+    //private_submodules_->low_cut_filter->Process(capture_buffer);
   }
-  RETURN_ON_ERR(
-      public_submodules_->gain_control->AnalyzeCaptureAudio(capture_buffer));
+  // RETURN_ON_ERR(
+  //     public_submodules_->gain_control->AnalyzeCaptureAudio(capture_buffer));
   public_submodules_->noise_suppression->AnalyzeCaptureAudio(capture_buffer);
 
   // Ensure that the stream delay was set before the call to the
   // AEC ProcessCaptureAudio function.
   if (public_submodules_->echo_cancellation->is_enabled() &&
       !private_submodules_->echo_controller && !was_stream_delay_set()) {
-    return AudioProcessing::kStreamParameterNotSetError;
+    //return AudioProcessing::kStreamParameterNotSetError;
   }
 
   if (private_submodules_->echo_controller) {
@@ -1334,18 +1334,18 @@ int AudioProcessingImpl::ProcessCaptureStreamLocked() {
   }
 
   if (capture_nonlocked_.beamformer_enabled) {
-    private_submodules_->beamformer->PostFilter(capture_buffer->split_data_f());
+  //  private_submodules_->beamformer->PostFilter(capture_buffer->split_data_f());
   }
 
-  public_submodules_->voice_detection->ProcessCaptureAudio(capture_buffer);
+  //public_submodules_->voice_detection->ProcessCaptureAudio(capture_buffer);
 
   if (constants_.use_experimental_agc &&
       public_submodules_->gain_control->is_enabled() &&
       (!capture_nonlocked_.beamformer_enabled ||
        private_submodules_->beamformer->is_target_present())) {
-    private_submodules_->agc_manager->Process(
-        capture_buffer->split_bands_const(0)[kBand0To8kHz],
-        capture_buffer->num_frames_per_band(), capture_nonlocked_.split_rate);
+    // private_submodules_->agc_manager->Process(
+    //     capture_buffer->split_bands_const(0)[kBand0To8kHz],
+    //     capture_buffer->num_frames_per_band(), capture_nonlocked_.split_rate);
   }
   RETURN_ON_ERR(public_submodules_->gain_control->ProcessCaptureAudio(
       capture_buffer, echo_cancellation()->stream_has_echo()));
@@ -1358,38 +1358,38 @@ int AudioProcessingImpl::ProcessCaptureStreamLocked() {
 
   if (config_.residual_echo_detector.enabled) {
     RTC_DCHECK(private_submodules_->echo_detector);
-    private_submodules_->echo_detector->AnalyzeCaptureAudio(
-        rtc::ArrayView<const float>(capture_buffer->channels_f()[0],
-                                    capture_buffer->num_frames()));
+  //  private_submodules_->echo_detector->AnalyzeCaptureAudio(
+  //      rtc::ArrayView<const float>(capture_buffer->channels_f()[0],
+  //                                  capture_buffer->num_frames()));
   }
 
   // TODO(aluebs): Investigate if the transient suppression placement should be
   // before or after the AGC.
   if (capture_.transient_suppressor_enabled) {
-    float voice_probability =
-        private_submodules_->agc_manager.get()
-            ? private_submodules_->agc_manager->voice_probability()
-            : 1.f;
+    //float voice_probability =
+    //    private_submodules_->agc_manager.get()
+    //       ? private_submodules_->agc_manager->voice_probability()
+    //        : 1.f;
 
-    public_submodules_->transient_suppressor->Suppress(
-        capture_buffer->channels_f()[0], capture_buffer->num_frames(),
-        capture_buffer->num_channels(),
-        capture_buffer->split_bands_const_f(0)[kBand0To8kHz],
-        capture_buffer->num_frames_per_band(), capture_buffer->keyboard_data(),
-        capture_buffer->num_keyboard_frames(), voice_probability,
-        capture_.key_pressed);
+  //  public_submodules_->transient_suppressor->Suppress(
+  //      capture_buffer->channels_f()[0], capture_buffer->num_frames(),
+  //      capture_buffer->num_channels(),
+  //      capture_buffer->split_bands_const_f(0)[kBand0To8kHz],
+  //      capture_buffer->num_frames_per_band(), capture_buffer->keyboard_data(),
+  //      capture_buffer->num_keyboard_frames(), voice_probability,
+  //      capture_.key_pressed);
   }
 
   if (config_.gain_controller2.enabled) {
-    private_submodules_->gain_controller2->Process(capture_buffer);
+    //private_submodules_->gain_controller2->Process(capture_buffer);
   }
 
   if (private_submodules_->capture_post_processor) {
-    private_submodules_->capture_post_processor->Process(capture_buffer);
+    //private_submodules_->capture_post_processor->Process(capture_buffer);
   }
 
   // The level estimator operates on the recombined data.
-  public_submodules_->level_estimator->ProcessStream(capture_buffer);
+  //public_submodules_->level_estimator->ProcessStream(capture_buffer);
 
   capture_output_rms_.Analyze(rtc::ArrayView<const int16_t>(
       capture_buffer->channels_const()[0],
@@ -1803,6 +1803,21 @@ AudioProcessing::Config AudioProcessingImpl::GetConfig() const {
 }
 
 bool AudioProcessingImpl::UpdateActiveSubmoduleStates() {
+  //gain_control()->Enable(false);
+  //config_.high_pass_filter.enabled =false;
+  // echo_cancellation()->Enable(false);
+  // config_.residual_echo_detector.enabled = false;
+  //public_submodules_->noise_suppression->Enable(true);
+  //capture_nonlocked_.intelligibility_enabled = false;
+  //capture_nonlocked_.beamformer_enabled = false;
+  //gain_control()->Enable(false);
+  //config_.gain_controller2.enabled = false;
+  //config_.pre_amplifier.enabled = false;
+  // capture_nonlocked_.echo_controller_enabled = false;
+  //public_submodules_->voice_detection->Enable(false);
+  //public_submodules_->level_estimator->Enable(false);
+  //capture_.transient_suppressor_enabled = false;
+
   return submodule_states_.Update(
       config_.high_pass_filter.enabled,
       public_submodules_->echo_cancellation->is_enabled(),

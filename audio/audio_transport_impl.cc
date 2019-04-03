@@ -138,23 +138,23 @@ int32_t AudioTransportImpl::RecordedDataIsAvailable(
   // Typing detection (utilizes the APM/VAD decision). We let the VAD determine
   // if we're using this feature or not.
   // TODO(solenberg): is_enabled() takes a lock. Work around that.
-  bool typing_detected = false;
-  if (audio_processing_->voice_detection()->is_enabled()) {
-    if (audio_frame->vad_activity_ != AudioFrame::kVadUnknown) {
-      bool vad_active = audio_frame->vad_activity_ == AudioFrame::kVadActive;
-      typing_detected = typing_detection_.Process(key_pressed, vad_active);
-    }
-  }
+  //bool typing_detected = false;
+  //if (audio_processing_->voice_detection()->is_enabled()) {
+  //  if (audio_frame->vad_activity_ != AudioFrame::kVadUnknown) {
+  //    bool vad_active = audio_frame->vad_activity_ == AudioFrame::kVadActive;
+  //    typing_detected = typing_detection_.Process(key_pressed, vad_active);
+  //  }
+  //}
 
   // Measure audio level of speech after all processing.
-  double sample_duration = static_cast<double>(number_of_frames) / sample_rate;
-  audio_level_.ComputeLevel(*audio_frame.get(), sample_duration);
+  //double sample_duration = static_cast<double>(number_of_frames) / sample_rate;
+  //audio_level_.ComputeLevel(*audio_frame.get(), sample_duration);
 
   // Copy frame and push to each sending stream. The copy is required since an
   // encoding task will be posted internally to each stream.
   {
     rtc::CritScope lock(&capture_lock_);
-    typing_noise_detected_ = typing_detected;
+    //typing_noise_detected_ = typing_detected;
 
     RTC_DCHECK_GT(audio_frame->samples_per_channel_, 0);
     if (!sending_streams_.empty()) {

@@ -69,3 +69,6 @@
 /xcodebuild
 !webrtc/*
 /third_party
+.vscode/
+
+*.log
