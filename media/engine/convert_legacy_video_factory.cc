@@ -123,11 +123,11 @@ class EncoderAdapter : public webrtc::VideoEncoderFactory {
     std::unique_ptr<webrtc::VideoEncoder> internal_encoder;
     if (IsFormatSupported(internal_encoder_factory_->GetSupportedFormats(),
                           format)) {
-      internal_encoder =
-          CodecNamesEq(format.name.c_str(), kVp8CodecName)
-              ? rtc::MakeUnique<webrtc::VP8EncoderSimulcastProxy>(
-                    internal_encoder_factory_.get())
-              : internal_encoder_factory_->CreateVideoEncoder(format);
+      // internal_encoder =
+      //     CodecNamesEq(format.name.c_str(), kVp8CodecName)
+      //         ? rtc::MakeUnique<webrtc::VP8EncoderSimulcastProxy>(
+      //               internal_encoder_factory_.get())
+      //         : internal_encoder_factory_->CreateVideoEncoder(format);
     }
 
     // Try creating external encoder.

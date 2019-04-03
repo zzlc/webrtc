@@ -40,6 +40,11 @@ VideoCapturer::VideoCapturer() : apply_rotation_(false) {
   Construct();
 }
 
+VideoCapturer::~VideoCapturer()
+{
+  capture_format_.reset();
+}
+
 void VideoCapturer::Construct() {
   enable_camera_list_ = false;
   capture_state_ = CS_STOPPED;
@@ -341,6 +346,8 @@ int64_t VideoCapturer::GetFormatDistance(const VideoFormat& desired,
 void VideoCapturer::UpdateFilteredSupportedFormats() {
   filtered_supported_formats_.clear();
   filtered_supported_formats_ = supported_formats_;
+  return;
+  
   if (!max_format_) {
     return;
   }

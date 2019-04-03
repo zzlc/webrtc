@@ -77,7 +77,7 @@ class VideoCapturer : public sigslot::has_slots<>,
  public:
   VideoCapturer();
 
-  virtual ~VideoCapturer() {}
+  virtual ~VideoCapturer();
 
   // Gets the id of the underlying device, which is available after the capturer
   // is initialized. Can be used to determine if two capturers reference the
@@ -232,7 +232,12 @@ class VideoCapturer : public sigslot::has_slots<>,
   }
 
   void SetCaptureFormat(const VideoFormat* format) {
-    capture_format_.reset(format ? new VideoFormat(*format) : NULL);
+    // capture_format_.reset(format ? new VideoFormat(*format) : NULL);
+    if (NULL!= format) {
+      capture_format_.reset(new VideoFormat(*format));
+    } else {
+      // capture_format_.reset();
+    }
   }
 
   void SetSupportedFormats(const std::vector<VideoFormat>& formats);
