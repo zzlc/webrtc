@@ -50,11 +50,11 @@ void WebrtcAlsaErrorHandler(const char* file,
 
 namespace webrtc {
 //static const unsigned int ALSA_PLAYOUT_FREQ = 48000;
-static const unsigned int ALSA_PLAYOUT_FREQ = 16000;
+static const unsigned int ALSA_PLAYOUT_FREQ = 8000;
 static const unsigned int ALSA_PLAYOUT_CH = 1;
 static const unsigned int ALSA_PLAYOUT_LATENCY = 40 * 1000;  // in us
 //static const unsigned int ALSA_CAPTURE_FREQ = 48000;
-static const unsigned int ALSA_CAPTURE_FREQ = 16000;
+static const unsigned int ALSA_CAPTURE_FREQ = 8000;
 static const unsigned int ALSA_CAPTURE_CH = 1;
 static const unsigned int ALSA_CAPTURE_LATENCY = 40 * 1000;  // in us
 static const unsigned int ALSA_CAPTURE_WAIT_TIMEOUT = 10;     // in ms
@@ -778,7 +778,7 @@ int32_t AudioDeviceLinuxALSA::InitPlayout() {
   GetDevicesInfo(2, true, _outputDeviceIndex, deviceName,
                  kAdmMaxDeviceNameSize);
 
-  RTC_LOG(LS_VERBOSE) << "InitPlayout open (" << deviceName << ")";
+  RTC_LOG(LS_INFO) << "InitPlayout open (" << deviceName << ")";
 
   errVal = LATE(snd_pcm_open)(&_handlePlayout, deviceName,
                               SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK);
@@ -800,6 +800,10 @@ int32_t AudioDeviceLinuxALSA::InitPlayout() {
     _handlePlayout = NULL;
     return -1;
   }
+
+  RTC_LOG(LS_INFO) << " Opened audio device name:" << deviceName 
+    << "play sample rate:" << _playoutFreq 
+    << ", channel:" << (int32_t)_playChannels;
 
   _playoutFramesIn10MS = _playoutFreq / 100;
   if ((errVal = LATE(snd_pcm_set_params)(
@@ -1103,7 +1107,7 @@ int32_t AudioDeviceLinuxALSA::StopRecording() {
   if (muteEnabled) {
     SetMicrophoneMute(false);
   }
-
+  
   // set the pcm input handle to NULL
   _handleRecord = NULL;
   return 0;
@@ -1144,8 +1148,6 @@ int32_t AudioDeviceLinuxALSA::StartPlayout() {
   // PLAYOUT
   _ptrThreadPlay.reset(new rtc::PlatformThread(
       PlayThreadFunc, this, "webrtc_audio_module_play_thread"));
-  _ptrThreadPlay->Start();
-  _ptrThreadPlay->SetPriority(rtc::kRealtimePriority);
 
   int errVal = LATE(snd_pcm_prepare)(_handlePlayout);
   if (errVal < 0) {
@@ -1154,12 +1156,15 @@ int32_t AudioDeviceLinuxALSA::StartPlayout() {
     // just log error
     // if snd_pcm_open fails will return -1
   }
+  _ptrThreadPlay->Start();
+  _ptrThreadPlay->SetPriority(rtc::kRealtimePriority);
 
   return 0;
 }
 
 int32_t AudioDeviceLinuxALSA::StopPlayout() {
   {
+    RTC_LOG(LS_INFO) << __FUNCTION__;
     rtc::CritScope lock(&_critSect);
 
     if (!_playIsInitialized) {
@@ -1375,7 +1380,7 @@ int32_t AudioDeviceLinuxALSA::OutputSanityCheckAfterUnlockedPeriod() const {
 int32_t AudioDeviceLinuxALSA::ErrorRecovery(int32_t error,
                                             snd_pcm_t* deviceHandle) {
   int st = LATE(snd_pcm_state)(deviceHandle);
-  RTC_LOG(LS_VERBOSE) << "Trying to recover from "
+  RTC_LOG(LS_INFO) << "Trying to recover from "
                       << ((LATE(snd_pcm_stream)(deviceHandle) ==
                            SND_PCM_STREAM_CAPTURE)
                               ? "capture"
@@ -1413,9 +1418,9 @@ int32_t AudioDeviceLinuxALSA::ErrorRecovery(int32_t error,
   // snd_pcm_recover isn't available in older alsa, e.g. on the FC4 machine
   // in Sthlm lab.
 
-  int res = LATE(snd_pcm_recover)(deviceHandle, error, 1);
+  int res = LATE(snd_pcm_recover)(deviceHandle, error, 0);
   if (0 == res) {
-    RTC_LOG(LS_VERBOSE) << "Recovery - snd_pcm_recover OK";
+    RTC_LOG(LS_INFO) << "Recovery - snd_pcm_recover OK";
 
     if ((error == -EPIPE || error == -ESTRPIPE) &&  // Buf underrun/overrun.
         _recording &&
@@ -1427,6 +1432,9 @@ int32_t AudioDeviceLinuxALSA::ErrorRecovery(int32_t error,
         RTC_LOG(LS_ERROR) << "Recovery - snd_pcm_start error: " << err;
         return -1;
       }
+    } else {
+      // add by cgb
+      RTC_LOG(LS_ERROR) << "snd_pcm_recover failed, err msg:" << LATE(snd_strerror)(res);
     }
 
     if ((error == -EPIPE || error == -ESTRPIPE) &&  // Buf underrun/overrun.

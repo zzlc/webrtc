@@ -183,7 +183,8 @@ void AudioState::UpdateAudioTransportWithSendingStreams() {
     max_sample_rate_hz = std::max(max_sample_rate_hz, kv.second.sample_rate_hz);
     max_num_channels = std::max(max_num_channels, kv.second.num_channels);
   }
-  max_sample_rate_hz = 16000;
+  max_sample_rate_hz = 8000;
+  max_num_channels = 1;
   audio_transport_.UpdateSendingStreams(std::move(sending_streams),
                                         max_sample_rate_hz, max_num_channels);
 }
